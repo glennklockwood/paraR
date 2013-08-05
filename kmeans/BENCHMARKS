@@ -1,0 +1,15 @@
+As tested on XSEDE's Gordon resource at SDSC (Intel Xeon E5-2670) on Aug 4, 2013
+
+script                  time(s)     centers workers
+kmeans-serial.R         25.317      4         1
+kmeans-lapply.R         43.613      4         1
+kmeans-mclapply.R       20.932      4         2 (25/25/25/25)
+kmeans-mclapply.R       16.023      4         2 (50/50)
+kmeans-mclapply.R       11.817      4         4 (25/25/25/25)
+kmeans-mclapply.R       11.644      4         5 (20/20/20/20/20)
+kmeans-mclapply.R        9.519      4        10 (10/10/10/10/10/10/10/10/10/10)
+kmeans-foreach.R        39.510      4         1
+kmeans-foreach.R        13.139      4         2 (50/50)
+kmeans-foreach.R        11.195      4         4 (25/25/25/25)
+kmeans-foreach.R         9.956      4         5 (20/20/20/20)
+kmeans-foreach.R         8.495      4        10 (10/10/10/10/10/10/10/10/10/10)
