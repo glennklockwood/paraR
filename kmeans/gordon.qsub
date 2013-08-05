@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -N Rjob
+#PBS -l nodes=1:ppn=16:native
+#PBS -l walltime=00:15:00
+
+### Load Glenn's custom R/3.0.1 with snow and Rmpi
+source /etc/profile.d/modules.sh
+export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
+module swap mvapich2_ib openmpi_ib
+module load R/3.0.1
+
+cd $PBS_O_WORKDIR
+
+### Make sure our dataset exists
+if [ ! -f "dataset.csv" ]
+then
+    ./gen-data.R || exit 1
+fi
+
+orterun -n 1 R CMD BATCH ./kmeans-doSNOW.R
