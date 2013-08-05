@@ -2,6 +2,8 @@ k-means Parallel R Examples
 ===========================
 
 * BENCHMARKS - some very basic, unscientific performance measurements for these codes
+* gordon-mc.qsub - submit script to run single-node R jobs on XSEDE/SDSC Gordon
+* gordon-snow.qsub - submit script to run multi-node R jobs on XSEDE/SDSC Gordon
 * gen-data.R - script to generate the 'dataset.csv' required by all of these examples
 * kmeans-serial.R - the simplest possible serial reference code
 * kmeans-lapply.R - the serial implementation using lapply
