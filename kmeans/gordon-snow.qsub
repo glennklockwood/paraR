@@ -8,6 +8,7 @@ source /etc/profile.d/modules.sh
 export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
 module swap mvapich2_ib openmpi_ib
 module load R/3.0.1
+export OMP_NUM_THREADS=1
 
 cd $PBS_O_WORKDIR
 
@@ -17,4 +18,5 @@ then
     ./gen-data.R || exit 1
 fi
 
+### Run the R script itself within the OpenMPI environment
 orterun -n 1 R CMD BATCH ./kmeans-doSNOW.R
