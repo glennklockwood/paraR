@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 #
-#  Job script to spin up a semi-persistent Hadoop cluster on XSEDE/SDSC Gordon
+#  Job script to run the Hadoop streaming wordcount example on XSEDE/SDSC Gordon
 #
 #  Glenn K. Lockwood, San Diego Supercomputer Center                 August 2013
 #
@@ -14,7 +14,7 @@
 #PBS -j oe
 #PBS -o hadoopcluster.log
 #PBS -v Catalina_maxhops=None
- 
+
 cd $PBS_O_WORKDIR
  
 export MY_HADOOP_HOME="/opt/hadoop/contrib/myHadoop"
@@ -35,7 +35,7 @@ $MY_HADOOP_HOME/bin/configure.sh -n 2 -c $HADOOP_CONF_DIR || exit 1
 ### Gordon: myHadoop template environment has dummy vars that must be replaced
 sed -i 's:^export HADOOP_PID_DIR=.*:export HADOOP_PID_DIR=/scratch/'$USER'/'$PBS_JOBID':' $HADOOP_CONF_DIR/hadoop-env.sh
 sed -i 's:^export TMPDIR=.*:export TMPDIR=/scratch/'$USER'/'$PBS_JOBID':' $HADOOP_CONF_DIR/hadoop-env.sh
-
+ 
 ### Gordon: R environment variables
 cat <<'EOF' >> $HADOOP_CONF_DIR/hadoop-env.sh
 export PATH=/home/glock/gordon/R/bin:/opt/hadoop/bin:$PATH
@@ -55,12 +55,18 @@ $HADOOP_HOME/bin/start-all.sh
 source /etc/profile.d/modules.sh
 module swap mvapich2_ib openmpi_ib
 module load R/3.0.1 protobuf
-### Rhipe 0.73 also implicitly needs hdfs:///tmp to exist for some reason(???)
-$HADOOP_HOME/bin/hadoop dfs -mkdir /tmp
 
 ### insert job here ############################################################
+$HADOOP_HOME/bin/hadoop dfs -copyFromLocal ./pg2701.txt mobydick.txt
 
-R CMD BATCH ./wordcount-rhipe.R
+$HADOOP_HOME/bin/hadoop jar /opt/hadoop/contrib/streaming/hadoop-streaming-1.0.3.jar \
+    -D mapred.reduce.tasks=2 \
+    -mapper "Rscript $PWD/wordcount-streaming-mapper.R" \
+    -reducer "Rscript $PWD/wordcount-streaming-reducer.R" \
+    -input mobydick.txt \
+    -output output
+
+$HADOOP_HOME/bin/hadoop dfs -cat output/part-* > ./output
 
 ################################################################################
 

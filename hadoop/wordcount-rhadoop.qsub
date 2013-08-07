@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 #
-#  Job script to spin up a semi-persistent Hadoop cluster on XSEDE/SDSC Gordon
+#  Job script to spin up a Hadoop cluster and use R with it on XSEDE/SDSC Gordon
 #
 #  Glenn K. Lockwood, San Diego Supercomputer Center                 August 2013
 #
@@ -55,12 +55,10 @@ $HADOOP_HOME/bin/start-all.sh
 source /etc/profile.d/modules.sh
 module swap mvapich2_ib openmpi_ib
 module load R/3.0.1 protobuf
-### Rhipe 0.73 also implicitly needs hdfs:///tmp to exist for some reason(???)
-$HADOOP_HOME/bin/hadoop dfs -mkdir /tmp
 
 ### insert job here ############################################################
 
-R CMD BATCH ./wordcount-rhipe.R
+R CMD BATCH ./wordcount-rhadoop.R
 
 ################################################################################
 

@@ -35,7 +35,7 @@ reducer <- expression(
         running_total <- sum(running_total, unlist(reduce.values))
     },
     post = {
-        rhcollect(reduce.key,as.character(running_total))
+        rhcollect(reduce.key, running_total)
     }
 )
 
@@ -43,7 +43,8 @@ reducer <- expression(
 rhput(input.file.local, input.file.hdfs)
 
 # rhwatch launches the Hadoop job
-rhipe.results <- rhwatch(map=mapper, reduce=reducer,
+rhipe.results <- rhwatch(
+                        map=mapper, reduce=reducer,
                         input=rhfmt(input.file.hdfs, type="text"),
                         output=output.dir.hdfs,
                         jobname='Wordcount',
@@ -53,6 +54,7 @@ rhipe.results <- rhwatch(map=mapper, reduce=reducer,
 # results on HDFS are in Rhipe object binary format, NOT ASCII, and must be
 # read using rhread().  results becomes a list of two-item lists (key,val)
 results <- rhread(paste(output.dir.hdfs, "/part-*", sep = ""))
+
 # the data.frame() below converts list of (key,val) to a list of keys and
 # a list of vals, then dumps these into a file with tab delimitation
 write.table( data.frame(words=unlist(lapply(X=results,FUN="[[",1)), 
