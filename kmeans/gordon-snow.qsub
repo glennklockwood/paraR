@@ -2,8 +2,9 @@
 #PBS -N Rjob
 #PBS -l nodes=2:ppn=16:native
 #PBS -l walltime=00:15:00
+#PBS -q normal
 
-### Load Glenn's custom R/3.0.1 with snow and Rmpi
+### Special R/3.0.1 with MPI/Hadoop libraries
 source /etc/profile.d/modules.sh
 export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
 module swap mvapich2_ib openmpi_ib
