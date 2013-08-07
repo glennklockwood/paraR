@@ -1,0 +1,70 @@
+#!/bin/bash
+################################################################################
+#
+#  Job script to spin up a semi-persistent Hadoop cluster on XSEDE/SDSC Gordon
+#
+#  Glenn K. Lockwood, San Diego Supercomputer Center                 June 2013
+#
+################################################################################
+#PBS -N hadoopcluster
+#PBS -l nodes=2:ppn=1:native
+#PBS -l walltime=00:15:00
+#PBS -q normal
+#PBS -m bae
+#PBS -j oe
+#PBS -o hadoopcluster.log
+#PBS -v Catalina_maxhops=None
+#PBS -V
+ 
+#module add java                        # not necessary on Gordon
+cd $PBS_O_WORKDIR
+ 
+export MY_HADOOP_HOME="/opt/hadoop/contrib/myHadoop"
+#source $MY_HADOOP_HOME/bin/setenv.sh   # this file is not used on Gordon
+
+export HADOOP_CONF_DIR=$PBS_O_WORKDIR/$PBS_JOBID
+
+### Gordon: need to build setenv.sh from hardcoded values in configure.sh
+TMPFILE=$(mktemp)
+grep '^export' $MY_HADOOP_HOME/bin/configure.sh > $TMPFILE
+source $TMPFILE && rm $TMPFILE
+
+### Gordon: Enable Hadoop over Infiniband (add ".ibnet0" suffix to hostnames)
+export PBS_NODEFILEZ=$(mktemp)
+sed -e 's/$/.ibnet0/g' $PBS_NODEFILE > $PBS_NODEFILEZ
+
+$MY_HADOOP_HOME/bin/configure.sh -n 2 -c $HADOOP_CONF_DIR || exit 1
+
+### Gordon: myHadoop template environment has dummy vars that must be replaced
+sed -i 's:^export HADOOP_PID_DIR=.*:export HADOOP_PID_DIR=/scratch/'$USER'/'$PBS_JOBID':' $HADOOP_CONF_DIR/hadoop-env.sh
+sed -i 's:^export TMPDIR=.*:export TMPDIR=/scratch/'$USER'/'$PBS_JOBID':' $HADOOP_CONF_DIR/hadoop-env.sh
+
+### Gordon: R environment variables
+cat <<'EOF' >> $HADOOP_CONF_DIR/hadoop-env.sh
+export PATH=/home/glock/gordon/R/bin:$PATH
+export LD_LIBRARY_PATH=/home/glock/gordon/R/lib:/usr/java/jdk1.6.0_26/jre/lib/amd64/server:/home/glock/gordon/R/lib64/R/library/rJava/libs:$LD_LIBRARY_PATH
+EOF
+# gordon login nodes                            /usr/java/jdk1.6.0_46/jre/lib/amd64/server
+# gordon compute nodes                          /usr/java/jdk1.6.0_26/jre/lib/amd64/server
+
+$HADOOP_HOME/bin/hadoop --config $HADOOP_CONF_DIR namenode -format
+ 
+$HADOOP_HOME/bin/start-all.sh
+
+### Necessary modules for Rhipe 0.73
+source /etc/profile.d/modules.sh
+module swap mvapich2_ib openmpi_ib
+module load R/3.0.1 protobuf
+### Rhipe 0.73 also implicitly needs hdfs:///tmp to exist for some reason(???)
+$HADOOP_HOME/bin/hadoop dfs -mkdir /tmp
+
+### insert job here ############################################################
+$HADOOP_HOME/bin/hadoop dfs -mkdir data
+
+R CMD BATCH ./wordcount-rhipe.R
+
+################################################################################
+
+$HADOOP_HOME/bin/stop-all.sh
+cp -Lr $HADOOP_LOG_DIR $PBS_O_WORKDIR/hadoop-logs.$PBS_JOBID
+$MY_HADOOP_HOME/bin/pbs-cleanup.sh -n 2
