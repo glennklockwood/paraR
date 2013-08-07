@@ -7,11 +7,11 @@
 
 library(Rhipe)
 rhinit()
-rhoptions(runner='/home/glock/gordon/R/lib64/R/library/Rhipe/bin/runner.sh')
+rhoptions(runner=paste(getwd(),'/rhipe-runner.sh',sep=''))
 
 input.file.local <- 'pg2701.txt'
-input.file.hdfs <- "/user/glock/data/mobydick.txt"
-output.dir.hdfs <- "/user/glock/data/output"
+input.file.hdfs <- paste('/user/',Sys.getenv('USER'),'/mobydick.txt',sep='')
+output.dir.hdfs <- paste('/user/',Sys.getenv('USER'),'/output',sep='')
 output.file.local <- 'output.txt'
 
 mapper <- expression( {
@@ -48,6 +48,7 @@ rhipe.results <- rhwatch(map=mapper, reduce=reducer,
                         output=output.dir.hdfs,
                         jobname='Wordcount',
                         mapred=list(mapred.reduce.tasks=2))
+# the mapred=... parameter is optional in rhwatch() above
 
 # results on HDFS are in Rhipe object binary format, NOT ASCII, and must be
 # read using rhread().  results becomes a list of two-item lists (key,val)
