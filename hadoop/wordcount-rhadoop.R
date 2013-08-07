@@ -34,7 +34,7 @@ rmr.results <- mapreduce(
     input=input.file.hdfs, input.format = "text",
     output=output.dir.hdfs,
     combine=T,
-    backend.parameters(hadoop=list(D="mapred.reduce.tasks=2")))
+    backend.parameters=list("mapred.reduce.tasks=2"))
 
 # results on HDFS are in RHadoop object binary format, NOT ASCII, and must be
 # read using from.dfs().  results becomes a list of two-item lists (key,val)
