@@ -53,6 +53,7 @@ $HADOOP_HOME/bin/start-all.sh
 
 ### Necessary modules for Rhadoop and Rhipe
 source /etc/profile.d/modules.sh
+export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
 module swap mvapich2_ib openmpi_ib
 module load R/3.0.1 protobuf
 
