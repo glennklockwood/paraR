@@ -8,3 +8,6 @@ website (http://users.sdsc.edu/~glockwood/index.php)
 Contents
 -------
 * kmeans - various parallel implementations of k-means clustering
+* streaming - scripts for wordcount example using Hadoop streaming
+* rhipe - scripts for wordcount example using RHIPE library
+* rhadoop - scripts for wordcount example using RHadoop
