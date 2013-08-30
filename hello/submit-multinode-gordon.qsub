@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -N helloR
+#PBS -l nodes=2:ppn=16:native
+#PBS -l walltime=05:00
+#PBS -q normal
+
+module swap mvapich2_ib openmpi_ib
+module load R
+
+cd $PBS_O_WORKDIR
+export OMP_NUM_THREADS=1
+# mpirun -n 1 R CMD BATCH ./hello-foreach-doMPI.R
+mpirun -n 1 R CMD BATCH ./hello-foreach-doSNOW.R

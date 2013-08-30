@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N helloR
+#PBS -l nodes=2:ppn=16
+#PBS -l walltime=05:00
+#PBS -q shared
+
+source /etc/profile.d/modules.sh
+module purge
+module load gnu/4.6.1 openmpi R
+
+cd $PBS_O_WORKDIR
+export OMP_NUM_THREADS=1
+
+# mpirun -n 1 R CMD BATCH ./hello-foreach-doMPI.R
+mpirun -n 1 R CMD BATCH ./hello-foreach-doSNOW.R
