@@ -4,18 +4,12 @@ hello.world <- function(i) {
    sprintf('Hello from loop iteration %d running on rank %d on node %s',
        i, mpi.comm.rank(), Sys.info()[c("nodename")]);
 }
- 
-library(foreach)
-library(doMPI)
-cl <- startMPIcluster(includemaster=TRUE)
- 
-registerDoMPI(cl)
- 
-output.lines <- foreach(i = (1:128)) %dopar% {
-   hello.world(i)
-}
 
+library(Rmpi)
+library(parallel)
+cl <- makeCluster( mpi.universe.size(), type='MPI' )
+
+output.lines <- parLapply( cl=cl, X=(1:128), fun=hello.world )
 cat(unlist(output.lines), sep='\n')
- 
-closeCluster(cl)
+stopCluster(cl)
 mpi.exit()

@@ -5,15 +5,18 @@ hello.world <- function(i) {
        i, mpi.comm.rank(), Sys.info()[c("nodename")]);
 }
  
+library(foreach)
 library(snow)
 library(doSNOW)
 
 cl <- makeCluster( mpi.universe.size(), type="MPI" )
 registerDoSNOW(cl)
  
-foreach(i = (1:128)) %dopar% {
+output.lines <- foreach(i = (1:128)) %dopar% {
    hello.world(i)
 }
  
+cat(unlist(output.lines), sep='\n')
+
 stopCluster(cl)
 mpi.exit()

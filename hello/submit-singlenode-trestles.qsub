@@ -10,6 +10,9 @@ module load gnu/4.6.1 openmpi R
 
 cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=1
+export MC_CORES=16
 
-# R CMD BATCH ./hello-foreach-serial.R
+R CMD BATCH ./hello-foreach-serial.R
 R CMD BATCH ./hello-foreach-doMC.R
+R CMD BATCH ./hello-lapply.R
+R CMD BATCH ./hello-mclapply.R

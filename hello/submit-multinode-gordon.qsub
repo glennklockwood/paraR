@@ -4,10 +4,14 @@
 #PBS -l walltime=05:00
 #PBS -q normal
 
+export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
 module swap mvapich2_ib openmpi_ib
-module load R
+module load R/3.0.1-gkl
 
 cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=1
-# mpirun -n 1 R CMD BATCH ./hello-foreach-doMPI.R
+mpirun -n 1 R CMD BATCH ./hello-foreach-doMPI.R
 mpirun -n 1 R CMD BATCH ./hello-foreach-doSNOW.R
+mpirun -n 1 R CMD BATCH ./hello-ClusterApply.R
+mpirun -n 1 R CMD BATCH ./hello-sfClusterApply.R
+mpirun -n 1 R CMD BATCH ./hello-parLapply.R

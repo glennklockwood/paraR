@@ -4,10 +4,14 @@
 #PBS -l walltime=05:00
 #PBS -q normal
 
-module load R
+export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
+module load R/3.0.1-gkl
 
 cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=1
+export MC_CORES=16
 
-# R CMD BATCH ./hello-foreach-serial.R
+R CMD BATCH ./hello-foreach-serial.R
 R CMD BATCH ./hello-foreach-doMC.R
+R CMD BATCH ./hello-lapply.R
+R CMD BATCH ./hello-mclapply.R
