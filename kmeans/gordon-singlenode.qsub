@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N Rjob
-#PBS -l nodes=2:ppn=16:native
+#PBS -l nodes=1:ppn=16:native
 #PBS -l walltime=00:15:00
 #PBS -q normal
 
@@ -8,7 +8,7 @@
 source /etc/profile.d/modules.sh
 export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
 module swap mvapich2_ib openmpi_ib
-module load R/3.0.1
+module load R/3.0.1-gkl
 export OMP_NUM_THREADS=1
 
 cd $PBS_O_WORKDIR
@@ -19,5 +19,12 @@ then
     ./gen-data.R || exit 1
 fi
 
-### Run the R script itself within the OpenMPI environment
-orterun -n 1 R CMD BATCH ./kmeans-doSNOW.R
+### Uncomment line to modify how many cores to use
+#export MC_CORES=8
+
+### Run the R script itself
+R CMD BATCH ./kmeans-serial.R
+R CMD BATCH ./kmeans-lapply.R
+R CMD BATCH ./kmeans-mclapply.R
+R CMD BATCH ./kmeans-foreach.R
+R CMD BATCH ./kmeans-doMC.R

@@ -11,7 +11,7 @@ parallel.function <- function(i) {
 cl <- makeCluster( mpi.universe.size(), type="MPI" )
 clusterExport(cl, c('data'))
 
-results <- clusterApply( cl, c(25,25,25,25), fun=parallel.function )
+results <- parLapply( cl, c(25,25,25,25), fun=parallel.function )
 temp.vector <- sapply( results, function(result) { result$tot.withinss } )
 result <- results[[which.min(temp.vector)]]
 print(result)
