@@ -55,7 +55,7 @@ $HADOOP_HOME/bin/start-all.sh
 source /etc/profile.d/modules.sh
 export MODULEPATH=/home/glock/gordon/modulefiles:$MODULEPATH
 module swap mvapich2_ib openmpi_ib
-module load R/3.0.1 protobuf
+module load R/3.0.1-gkl protobuf
 
 ### insert job here ############################################################
 
