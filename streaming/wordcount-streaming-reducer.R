@@ -18,7 +18,7 @@ while ( length(line <- readLines(stdin, n=1)) > 0 ) {
             cat( paste(last_key,'\t',running_total,'\n',sep='') )
         }
         running_total <- value
-        last_key = this_key
+        last_key <- this_key
     }
 }
 
